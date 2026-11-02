@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Flag Rush</title>
+<title>Game Zone</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -46,6 +46,21 @@ h1 span{color:var(--accent)}
 .small{color:var(--dim);margin-bottom:20px}
 .err{padding:30px 10px;text-align:center;color:var(--dim)}
 .credit{margin-top:26px;text-align:center;font-size:11px;color:#5b5e70}
+.hubc{display:flex;align-items:center;gap:14px;width:100%;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;color:var(--text);text-align:left}
+.hubc em{font-style:normal;font-size:34px}.hubc b{font-size:19px;display:block}.hubc small{color:var(--dim)}
+.brd{display:grid;grid-template-columns:repeat(8,1fr);border-radius:10px;overflow:hidden;margin:12px 0;aspect-ratio:1;touch-action:manipulation}
+.sq{display:grid;place-items:center;font-size:min(9.5vw,44px);line-height:1;position:relative;user-select:none}
+.sq.l{background:#e8d9b5}.sq.d{background:#a97c50}.sq.sel{background:#f6e05e!important}.sq.chk{background:#f87171!important}
+.sq.mv::after,.sq.cap::after{content:"";position:absolute;border-radius:50%}
+.sq.mv::after{width:28%;height:28%;background:rgba(0,0,0,.28)}.sq.cap::after{width:86%;height:86%;border:4px solid rgba(220,38,38,.65)}
+.pw{color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 1px 1px #000}.pb{color:#111}
+.cmsg{text-align:center;font-weight:700;margin-bottom:6px}
+.ldsvg{width:100%;display:block;border-radius:12px;background:#f8fafc;margin:10px 0}
+.ldctl{display:flex;align-items:center;gap:14px;margin:12px 0}.ldmsg{flex:1;font-weight:700;font-size:15px}
+.dice{width:76px;height:76px;border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--text);font-size:50px;line-height:1}
+.dice:not(:disabled){border-color:var(--accent);animation:pul 1s infinite}
+.tok{transform-box:fill-box;transform-origin:center}.tok.mv{cursor:pointer;animation:pul .8s infinite}
+@keyframes pul{50%{transform:scale(1.18)}}
 </style>
 </head>
 <body>
@@ -89,9 +104,9 @@ function shuffle(a, r) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) {
 
 let best = 0, challenge = null, G = null, timer = null;
 
-function home() {
+function flagHome() {
   clearInterval(timer);
-  $("app").innerHTML = `<h1>FLAG<br><span>RUSH</span> 🏁</h1><p class="sub">Name the country before the clock runs out.</p>` +
+  $("app").innerHTML = `<button class="alt" data-act="hub" style="margin:0 0 16px;padding:10px">← All games</button><h1>FLAG<br><span>RUSH</span> 🏁</h1><p class="sub">Name the country before the clock runs out.</p>` +
     (challenge ? `<div class="banner">🔥 A friend scored ${challenge.score} points.<br>Think you can beat them?<br><button id="accept">Accept challenge</button></div>` : "") +
     `<button class="go" id="play">PLAY</button>
      <div class="rules"><div><b>⏱️ ${SECS}s</b>per flag</div><div><b>❤️ ${LIVES}</b>lives</div><div><b>🔥</b>streaks score more</div></div>
@@ -175,7 +190,207 @@ $("app").addEventListener("click", e => {
   if (t.id === "play" || t.id === "again") return newGame(Math.floor(Math.random() * 1e6));
   if (t.id === "accept") return newGame(challenge.seed);
   if (t.id === "share") return share();
-  if (t.id === "menu") return home();
+  if (t.id === "menu") return hub();
+});
+
+
+// ================= GAME HUB =================
+let LD = null, CH = null;
+function hub() {
+  clearInterval(timer); LD = null; CH = null;
+  $("app").innerHTML = `<h1>GAME<br><span>ZONE</span> 🎮</h1><p class="sub">Pick a game.</p>
+    <button class="hubc" data-act="flag"><em>🏁</em><div><b>Flag Rush</b><small>Name the flag in 10 seconds</small></div></button>
+    <button class="hubc" data-act="ludo"><em>🎲</em><div><b>Ludo</b><small>You against the computer</small></div></button>
+    <button class="hubc" data-act="chess"><em>♟️</em><div><b>Chess</b><small>Hard level against the computer</small></div></button>`;
+}
+
+// ================= CHESS (you are white) =================
+const PV = {p: 100, n: 320, b: 330, r: 500, q: 900, k: 0};
+const GL = {p: "♟\uFE0E", n: "♞\uFE0E", b: "♝\uFE0E", r: "♜\uFE0E", q: "♛\uFE0E", k: "♚\uFE0E"};
+const isW = c => c === c.toUpperCase();
+const KD = [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]], RD = [[1,0],[-1,0],[0,1],[0,-1]], BD = [[1,1],[1,-1],[-1,1],[-1,-1]], KG = RD.concat(BD);
+function cInit() { const b = Array(64).fill(null), bk = "rnbqkbnr"; for (let i = 0; i < 8; i++) { b[i] = bk[i]; b[8 + i] = "p"; b[48 + i] = "P"; b[56 + i] = bk[i].toUpperCase(); } return {b, t: "w", cr: {K: 1, Q: 1, k: 1, q: 1}, ep: -1}; }
+const inB = (x, y) => x >= 0 && x < 8 && y >= 0 && y < 8;
+function attacked(b, sq, byW) {
+  const x = sq % 8, y = sq >> 3, P = byW ? "P" : "p", N = byW ? "N" : "n", B = byW ? "B" : "b", R = byW ? "R" : "r", Q = byW ? "Q" : "q", K = byW ? "K" : "k", py = y + (byW ? 1 : -1);
+  for (const dx of [-1, 1]) if (inB(x + dx, py) && b[py * 8 + x + dx] === P) return true;
+  for (const [dx, dy] of KD) if (inB(x + dx, y + dy) && b[(y + dy) * 8 + x + dx] === N) return true;
+  for (const [dx, dy] of KG) if (inB(x + dx, y + dy) && b[(y + dy) * 8 + x + dx] === K) return true;
+  for (const [ds, A] of [[RD, R], [BD, B]]) for (const [dx, dy] of ds) { let nx = x + dx, ny = y + dy; while (inB(nx, ny)) { const c = b[ny * 8 + nx]; if (c) { if (c === A || c === Q) return true; break; } nx += dx; ny += dy; } }
+  return false;
+}
+function pseudo(s) {
+  const b = s.b, w = s.t === "w", out = [];
+  for (let i = 0; i < 64; i++) {
+    const c = b[i]; if (!c || isW(c) !== w) continue;
+    const x = i % 8, y = i >> 3, p = c.toLowerCase(), push = (to, fl) => out.push({f: i, t: to, fl});
+    if (p === "p") {
+      const d = w ? -1 : 1, sy = w ? 6 : 1, ly = w ? 0 : 7, y1 = y + d;
+      if (!b[y1 * 8 + x]) { push(y1 * 8 + x, y1 === ly ? "q" : ""); if (y === sy && !b[(y + 2 * d) * 8 + x]) push((y + 2 * d) * 8 + x, "dp"); }
+      for (const dx of [-1, 1]) { if (!inB(x + dx, y1)) continue; const to = y1 * 8 + x + dx; if (b[to] && isW(b[to]) !== w) push(to, y1 === ly ? "q" : ""); else if (to === s.ep) push(to, "ep"); }
+    } else if (p === "n" || p === "k") {
+      for (const [dx, dy] of p === "n" ? KD : KG) { if (!inB(x + dx, y + dy)) continue; const to = (y + dy) * 8 + x + dx; if (!b[to] || isW(b[to]) !== w) push(to, ""); }
+      if (p === "k" && !attacked(b, i, !w)) {
+        const r0 = w ? 56 : 0, Kc = w ? "K" : "k", Qc = w ? "Q" : "q", Rc = w ? "R" : "r";
+        if (s.cr[Kc] && !b[r0 + 5] && !b[r0 + 6] && b[r0 + 7] === Rc && !attacked(b, r0 + 5, !w) && !attacked(b, r0 + 6, !w)) push(r0 + 6, "ck");
+        if (s.cr[Qc] && !b[r0 + 1] && !b[r0 + 2] && !b[r0 + 3] && b[r0] === Rc && !attacked(b, r0 + 3, !w) && !attacked(b, r0 + 2, !w)) push(r0 + 2, "cq");
+      }
+    } else {
+      for (const [dx, dy] of p === "r" ? RD : p === "b" ? BD : KG) { let nx = x + dx, ny = y + dy; while (inB(nx, ny)) { const to = ny * 8 + nx, o = b[to]; if (!o) push(to, ""); else { if (isW(o) !== w) push(to, ""); break; } nx += dx; ny += dy; } }
+    }
+  }
+  return out;
+}
+function make(s, m) {
+  const b = s.b.slice(), c = b[m.f], w = isW(c), cr = Object.assign({}, s.cr); let ep = -1;
+  b[m.t] = c; b[m.f] = null;
+  if (m.fl === "ep") b[m.t + (w ? 8 : -8)] = null;
+  if (m.fl === "dp") ep = (m.f + m.t) >> 1;
+  if (m.fl === "q") b[m.t] = w ? "Q" : "q";
+  if (m.fl === "ck") { b[m.t - 1] = b[m.t + 1]; b[m.t + 1] = null; }
+  if (m.fl === "cq") { b[m.t + 1] = b[m.t - 2]; b[m.t - 2] = null; }
+  if (c === "K") cr.K = cr.Q = 0; if (c === "k") cr.k = cr.q = 0;
+  if (m.f === 63 || m.t === 63) cr.K = 0; if (m.f === 56 || m.t === 56) cr.Q = 0; if (m.f === 7 || m.t === 7) cr.k = 0; if (m.f === 0 || m.t === 0) cr.q = 0;
+  return {b, t: w ? "b" : "w", cr, ep};
+}
+const inCheck = s => attacked(s.b, s.b.indexOf(s.t === "w" ? "K" : "k"), s.t !== "w");
+function legal(s) { const w = s.t === "w"; return pseudo(s).filter(m => { const n = make(s, m); return !attacked(n.b, n.b.indexOf(w ? "K" : "k"), !w); }); }
+function evalS(s) {
+  let v = 0;
+  for (let i = 0; i < 64; i++) {
+    const c = s.b[i]; if (!c) continue;
+    const p = c.toLowerCase(), w = isW(c), x = i % 8, y = i >> 3, cen = 7 - Math.abs(2 * x - 7) / 2 - Math.abs(2 * y - 7) / 2;
+    let sc = PV[p];
+    if (p === "n" || p === "b") sc += cen * 5; else if (p === "p") sc += cen * 2 + (w ? 6 - y : y - 1) * 6; else if (p === "k") sc -= cen * 4;
+    v += w ? sc : -sc;
+  }
+  return s.t === "w" ? v : -v;
+}
+const cval = c => c ? PV[c.toLowerCase()] : 0;
+const order = (s, ms) => ms.map(m => [m, (s.b[m.t] ? 10 * cval(s.b[m.t]) - cval(s.b[m.f]) : 0) + (m.fl === "q" ? 800 : 0)]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+let nodes = 0, dl = 0;
+function qs(s, a, b, qd) {
+  const st = evalS(s); if (qd <= 0 || st >= b) return st >= b ? b : st; if (st > a) a = st;
+  for (const m of order(s, legal(s).filter(m => s.b[m.t] || m.fl === "ep"))) { const v = -qs(make(s, m), -b, -a, qd - 1); if (v >= b) return b; if (v > a) a = v; }
+  return a;
+}
+function search(s, d, a, b, ply) {
+  if ((++nodes & 255) === 0 && Date.now() > dl) throw 0;
+  if (d <= 0) return qs(s, a, b, 4);
+  const ms = legal(s); if (!ms.length) return inCheck(s) ? -1e5 + ply : 0;
+  for (const m of order(s, ms)) { const v = -search(make(s, m), d - 1, -b, -a, ply + 1); if (v >= b) return b; if (v > a) a = v; }
+  return a;
+}
+function bestMove(s, ms) { // HARD: iterative deepening, about 1.7 seconds of thinking, depth 4-6
+  ms = order(s, ms || legal(s)); if (ms.length < 2) return ms[0];
+  let best = ms[0]; nodes = 0; dl = Date.now() + 1700;
+  try { for (let d = 1; d <= 6; d++) { let bm = null, al = -1e9; for (const m of ms) { const v = -search(make(s, m), d - 1, -1e9, -al, 1); if (v > al) { al = v; bm = m; } } best = bm; ms = [bm].concat(ms.filter(x => x !== bm)); if (al > 9e4) break; } } catch (e) {}
+  return best;
+}
+function chessStart() { CH = {s: cInit(), sel: -1, moves: [], over: "", think: false}; chessDraw(); }
+function chessEnd() { const C = CH; if (legal(C.s).length) return false; C.over = inCheck(C.s) ? (C.s.t === "w" ? "Checkmate. The computer wins." : "Checkmate! You win 🎉") : "Stalemate: it's a draw."; return true; }
+function chessDraw() {
+  const C = CH, s = C.s, k = s.b.indexOf("K"), chk = s.t === "w" && attacked(s.b, k, false); let h = "";
+  for (let i = 0; i < 64; i++) {
+    const c = s.b[i], r = i >> 3, f = i & 7, mt = C.moves.find(m => m.t === i); let cl = "sq " + ((r + f) % 2 ? "d" : "l");
+    if (i === C.sel) cl += " sel"; if (mt) cl += (c || mt.fl === "ep") ? " cap" : " mv"; if (chk && i === k) cl += " chk";
+    h += `<div class="${cl}" data-sq="${i}">${c ? `<span class="${isW(c) ? "pw" : "pb"}">${GL[c.toLowerCase()]}</span>` : ""}</div>`;
+  }
+  const st = C.over || (C.think ? "Computer is thinking…" : chk ? "Check! Your move" : "Your move (white)");
+  $("app").innerHTML = `<div class="hud"><span>♟ Chess</span><span class="st" style="min-width:0">HARD</span></div><div class="brd">${h}</div><div class="cmsg">${st}</div><button class="alt" data-act="cnew">New game</button><button class="alt" data-act="hub">← All games</button>`;
+}
+function chessClick(i) {
+  const C = CH; if (!C || C.think || C.over) return;
+  const c = C.s.b[i], m = C.moves.find(x => x.t === i);
+  if (C.sel >= 0 && m) {
+    C.s = make(C.s, m); C.sel = -1; C.moves = [];
+    if (chessEnd()) return chessDraw();
+    C.think = true; chessDraw();
+    setTimeout(() => { if (CH !== C) return; C.s = make(C.s, bestMove(C.s)); C.think = false; chessEnd(); chessDraw(); }, 60);
+    return;
+  }
+  if (c && isW(c)) { C.sel = i; C.moves = legal(C.s).filter(x => x.f === i); } else { C.sel = -1; C.moves = []; }
+  chessDraw();
+}
+
+// ================= LUDO (you are red) =================
+const LC = ["#ef4444", "#22c55e", "#facc15", "#3b82f6"], LN = ["Red", "Green", "Yellow", "Blue"], OFF = [0, 13, 26, 39], SAFE = new Set([0, 8, 13, 21, 26, 34, 39, 47]), FACE = "⚀⚁⚂⚃⚄⚅";
+const RING = "1,6 2,6 3,6 4,6 5,6 6,5 6,4 6,3 6,2 6,1 6,0 7,0 8,0 8,1 8,2 8,3 8,4 8,5 9,6 10,6 11,6 12,6 13,6 14,6 14,7 14,8 13,8 12,8 11,8 10,8 9,8 8,9 8,10 8,11 8,12 8,13 8,14 7,14 6,14 6,13 6,12 6,11 6,10 6,9 5,8 4,8 3,8 2,8 1,8 0,8 0,7 0,6".split(" ").map(p => p.split(",").map(Number));
+const HC = [0, 1, 2, 3].map(c => [0, 1, 2, 3, 4].map(k => [[1 + k, 7], [7, 1 + k], [13 - k, 7], [7, 13 - k]][c]));
+const YB = [[0, 0], [9, 0], [9, 9], [0, 9]], FIN = [[6.55, 7.5], [7.5, 6.55], [8.45, 7.5], [7.5, 8.45]];
+const nm = c => c === 0 ? "You" : LN[c], lcur = () => LD.ps[LD.ti];
+const later = (fn, ms) => { const me = LD; setTimeout(() => { if (LD === me) fn(); }, ms); };
+function ludoMenu() {
+  LD = null;
+  $("app").innerHTML = `<h1>LUDO 🎲</h1><p class="sub">You play red. Roll a 6 to bring a piece out. Land on another piece to send it home.</p>
+    <button class="go" data-act="bots" data-n="1">VS 1 COMPUTER</button><button class="alt" data-act="bots" data-n="2">VS 2 COMPUTERS</button><button class="alt" data-act="bots" data-n="3">VS 3 COMPUTERS</button><button class="alt" data-act="hub">← All games</button>`;
+}
+function ludoStart(n) { LD = {ps: [0, 2, 1, 3].slice(0, n + 1).sort(), pc: [0, 1, 2, 3].map(() => [-1, -1, -1, -1]), ti: 0, roll: 0, ph: "roll", msg: "Your turn: roll the dice", mv: []}; ludoDraw(); }
+function tpos(c, k, p) {
+  if (p < 0) return [YB[c][0] + 2 + (k % 2) * 2, YB[c][1] + 2 + (k >> 1) * 2];
+  if (p <= 50) { const [x, y] = RING[(OFF[c] + p) % 52]; return [x + .5 + (k - 1.5) * .06, y + .5]; }
+  if (p <= 55) { const [x, y] = HC[c][p - 51]; return [x + .5, y + .5]; }
+  return [FIN[c][0] + (k - 1.5) * .08, FIN[c][1]];
+}
+function ludoDraw() {
+  const L = LD; let g = `<svg class="ldsvg" viewBox="0 0 15 15">`;
+  YB.forEach(([x, y], c) => { g += `<rect x="${x}" y="${y}" width="6" height="6" fill="${LC[c]}" opacity=".85"/><rect x="${x + 1}" y="${y + 1}" width="4" height="4" rx=".6" fill="#fff" opacity=".92"/>`; });
+  RING.forEach(([x, y], i) => { const st = OFF.indexOf(i); g += `<rect x="${x}" y="${y}" width="1" height="1" fill="${st >= 0 ? LC[st] : SAFE.has(i) ? "#e5e7eb" : "#fff"}" stroke="#334155" stroke-width=".05"/>${SAFE.has(i) && st < 0 ? `<text x="${x + .5}" y="${y + .75}" font-size=".7" text-anchor="middle" fill="#64748b">★</text>` : ""}`; });
+  HC.forEach((col, c) => col.forEach(([x, y]) => { g += `<rect x="${x}" y="${y}" width="1" height="1" fill="${LC[c]}" opacity=".75" stroke="#334155" stroke-width=".05"/>`; }));
+  g += `<polygon points="6,6 9,6 7.5,7.5" fill="${LC[1]}"/><polygon points="9,6 9,9 7.5,7.5" fill="${LC[2]}"/><polygon points="9,9 6,9 7.5,7.5" fill="${LC[3]}"/><polygon points="6,9 6,6 7.5,7.5" fill="${LC[0]}"/>`;
+  L.ps.forEach(c => L.pc[c].forEach((p, k) => { const [x, y] = tpos(c, k, p), mv = L.ph === "pick" && c === 0 && L.mv.includes(k); g += `<circle class="tok${mv ? " mv" : ""}" ${mv ? `data-tok="${k}"` : ""} cx="${x}" cy="${y}" r="${mv ? .42 : .36}" fill="${LC[c]}" stroke="#fff" stroke-width=".12"/>`; }));
+  g += "</svg>";
+  const mine = L.ph === "roll" && lcur() === 0, over = L.ph === "over";
+  $("app").innerHTML = `<div class="hud"><span>🎲 Ludo</span><span style="color:${LC[lcur()]}">● ${nm(lcur())}</span><span class="st" style="min-width:0"></span></div>${g}
+    <div class="ldctl"><button class="dice" data-act="roll" ${mine ? "" : "disabled"}>${L.roll ? FACE[L.roll - 1] : "🎲"}</button><div class="ldmsg">${L.msg}</div></div>
+    <button class="alt" data-act="lmenu">${over ? "Play again" : "New game"}</button><button class="alt" data-act="hub">← All games</button>`;
+}
+const lcan = (c, k, r) => { const p = LD.pc[c][k]; return p < 0 ? r === 6 : p + r <= 56; };
+function botPick(c) {
+  const L = LD; let best = L.mv[0], bs = -1;
+  for (const k of L.mv) {
+    const p = L.pc[c][k], np = p < 0 ? 0 : p + L.roll; let sc = np;
+    if (np === 56) sc += 100; if (p < 0) sc += 60;
+    if (np <= 50) { const g = (OFF[c] + np) % 52; if (SAFE.has(g)) sc += 15; else L.ps.forEach(o => { if (o !== c) L.pc[o].forEach(q => { if (q >= 0 && q <= 50 && (OFF[o] + q) % 52 === g) sc += 90; }); }); }
+    if (sc > bs) { bs = sc; best = k; }
+  }
+  return best;
+}
+function startTurn() {
+  const L = LD; L.roll = 0;
+  if (lcur() === 0) { L.ph = "roll"; L.msg = "Your turn: roll the dice"; ludoDraw(); }
+  else { L.ph = "wait"; L.msg = `${LN[lcur()]} is playing…`; ludoDraw(); later(doRoll, 800); }
+}
+const nextTurn = () => { LD.ti = (LD.ti + 1) % LD.ps.length; startTurn(); };
+function doRoll() {
+  const L = LD, c = lcur(); L.roll = 1 + Math.floor(Math.random() * 6); L.mv = [0, 1, 2, 3].filter(k => lcan(c, k, L.roll));
+  if (!L.mv.length) { L.ph = "wait"; L.msg = `${nm(c)} rolled ${L.roll}: no move`; ludoDraw(); return later(nextTurn, 1000); }
+  if (c === 0 && L.mv.length > 1) { L.ph = "pick"; L.msg = "Tap a glowing piece"; ludoDraw(); return; }
+  L.ph = "wait"; L.msg = `${nm(c)} rolled ${L.roll}`; ludoDraw();
+  const k = c === 0 ? L.mv[0] : botPick(c); later(() => doMove(c, k), c === 0 ? 450 : 800);
+}
+function doMove(c, k) {
+  const L = LD, r = L.roll, p = L.pc[c][k], np = p < 0 ? 0 : p + r; let cap = false; L.pc[c][k] = np;
+  if (np <= 50) { const g = (OFF[c] + np) % 52; if (!SAFE.has(g)) L.ps.forEach(o => { if (o !== c) L.pc[o].forEach((q, j) => { if (q >= 0 && q <= 50 && (OFF[o] + q) % 52 === g) { L.pc[o][j] = -1; cap = true; } }); }); }
+  if (L.pc[c].every(q => q === 56)) { L.ph = "over"; L.msg = c === 0 ? "🎉 You win!" : `${LN[c]} wins!`; return ludoDraw(); }
+  const extra = r === 6 || cap || np === 56;
+  L.msg = `${nm(c)} moved${cap ? " and sent a piece home!" : ""}${extra ? ", roll again" : ""}`; ludoDraw();
+  later(extra ? startTurn : nextTurn, 800);
+}
+function ludoRoll() { if (LD && LD.ph === "roll" && lcur() === 0) doRoll(); }
+function ludoPick(k) { const L = LD; if (L && L.ph === "pick" && L.mv.includes(k)) { L.ph = "wait"; doMove(0, k); } }
+
+$("app").addEventListener("click", e => {
+  const a = e.target.closest("[data-act]");
+  if (a) {
+    const x = a.dataset.act;
+    if (x === "hub") return hub(); if (x === "flag") return flagHome();
+    if (x === "ludo" || x === "lmenu") return ludoMenu(); if (x === "bots") return ludoStart(+a.dataset.n); if (x === "roll") return ludoRoll();
+    if (x === "chess" || x === "cnew") return chessStart();
+    return;
+  }
+  const sq = e.target.closest("[data-sq]"); if (sq) return chessClick(+sq.dataset.sq);
+  const tk = e.target.closest("[data-tok]"); if (tk) return ludoPick(+tk.dataset.tok);
 });
 
 (async () => {
@@ -183,7 +398,7 @@ $("app").addEventListener("click", e => {
   let sp = ""; try { sp = (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) || new URLSearchParams(location.search).get("c") || ""; } catch (e) {}
   const m = sp.match(/^c-(\d+)-(\d+)$/);
   if (m) challenge = {seed: +m[1], score: +m[2]};
-  home();
+  challenge ? flagHome() : hub();
 })();
 </script>
 </body>
