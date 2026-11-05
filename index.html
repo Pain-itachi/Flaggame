@@ -61,6 +61,22 @@ h1 span{color:var(--accent)}
 .dice:not(:disabled){border-color:var(--accent);animation:pul 1s infinite}
 .tok{transform-box:fill-box;transform-origin:center}.tok.mv{cursor:pointer;animation:pul .8s infinite}
 @keyframes pul{50%{transform:scale(1.18)}}
+.ball{width:150px;height:150px;border-radius:50%;margin:10px auto 18px;display:grid;place-items:center;font-size:64px;background:radial-gradient(circle at 35% 30%,#c4b5fd,#7c3aed 55%,#2e1065);box-shadow:0 0 40px rgba(124,58,237,.55)}
+.ball.glow{box-shadow:0 0 60px rgba(250,204,21,.6)}.ball.shake{animation:shk .5s infinite}
+@keyframes shk{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.oin{width:100%;background:var(--card);border:2px solid var(--line);color:var(--text);border-radius:14px;padding:15px;font:inherit;font-size:17px;margin-bottom:14px}
+.oin.bad{border-color:var(--bad)}
+.oq{text-align:center;color:var(--dim);margin:6px 0 14px;font-weight:600;word-break:break-word}
+.orow{display:flex;justify-content:center;gap:28px;align-items:center;margin:8px 0;min-height:90px}
+.coin{width:84px;height:84px;border-radius:50%;background:#facc15;color:#1a1500;display:grid;place-items:center;font-size:24px;font-weight:800}
+.coin.spin{animation:spn .5s linear infinite}@keyframes spn{to{transform:rotateY(360deg)}}
+.die{font-size:84px;line-height:1;min-width:84px;text-align:center}
+.onote{text-align:center;font-weight:700;margin-top:10px;min-height:24px}
+.ores{text-align:center;font-size:64px;font-weight:800;letter-spacing:2px;line-height:1.1}.ores.y{color:var(--ok)}.ores.n{color:var(--bad)}
+.olv{text-align:center;font-size:22px;font-weight:800;margin-top:6px}.osay{text-align:center;color:var(--dim);margin:6px 0 18px}
+.ohist{margin-top:22px;font-size:14px}.ohist h3{font-size:13px;color:var(--dim);margin-bottom:8px}
+.ohist .r{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.ohist .r span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fine{margin-top:18px;text-align:center;font-size:11px;color:#5b5e70}
 </style>
 </head>
 <body>
@@ -195,13 +211,14 @@ $("app").addEventListener("click", e => {
 
 
 // ================= GAME HUB =================
-let LD = null, CH = null;
+let LD = null, CH = null, ORC = null;
 function hub() {
-  clearInterval(timer); LD = null; CH = null;
+  clearInterval(timer); LD = null; CH = null; ORC = null;
   $("app").innerHTML = `<h1>GAME<br><span>ZONE</span> 🎮</h1><p class="sub">Pick a game.</p>
     <button class="hubc" data-act="flag"><em>🏁</em><div><b>Flag Rush</b><small>Name the flag in 10 seconds</small></div></button>
     <button class="hubc" data-act="ludo"><em>🎲</em><div><b>Ludo</b><small>You against the computer</small></div></button>
-    <button class="hubc" data-act="chess"><em>♟️</em><div><b>Chess</b><small>Hard level against the computer</small></div></button>`;
+    <button class="hubc" data-act="chess"><em>♟️</em><div><b>Chess</b><small>Hard level against the computer</small></div></button>
+    <button class="hubc" data-act="oracle"><em>🔮</em><div><b>Fun Oracle</b><small>Ask anything. Get a yes or no</small></div></button>`;
 }
 
 // ================= CHESS (you are white) =================
@@ -380,6 +397,51 @@ function doMove(c, k) {
 function ludoRoll() { if (LD && LD.ph === "roll" && lcur() === 0) doRoll(); }
 function ludoPick(k) { const L = LD; if (L && L.ph === "pick" && L.mv.includes(k)) { L.ph = "wait"; doMove(0, k); } }
 
+// ================= FUN ORACLE =================
+const OL = ["Fairly agree", "Agree", "Mostly agree", "Really agree", "Very much agree", "Strongly agree"];
+const OS = ["The oracle shrugs, but fine.", "The oracle nods slowly.", "The oracle leans in: pretty sure.", "The oracle is quite convinced.", "The oracle would bet its crystal ball on it.", "The universe is shouting this at you!"];
+const ODIE = "⚀⚁⚂⚃⚄⚅";
+let OH = [];
+function beep(f, d) { try { const A = window.AudioContext || window.webkitAudioContext, c = beep.c || (beep.c = new A()), o = c.createOscillator(), g = c.createGain(); o.frequency.value = f; g.gain.value = .06; o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + d); } catch (e) {} }
+function haptic(t) { try { tg.HapticFeedback.impactOccurred(t); } catch (e) { try { navigator.vibrate(25); } catch (e2) {} } }
+async function oracleStart() {
+  try { OH = JSON.parse((await store.get("oracle-hist")) || "[]"); } catch (e) { OH = []; }
+  ORC = {ph: "ask"}; oracleDraw();
+}
+function oracleDraw() {
+  const O = ORC; let body;
+  const hist = OH.length ? `<div class="ohist"><h3>RECENT QUESTIONS</h3>${OH.map(h => `<div class="r">${h.y ? "✅" : "❌"}<span>${esc(h.q)}</span><small>🎲${h.d}</small></div>`).join("")}<button class="alt" data-act="oclear" style="margin-top:12px;padding:10px">Clear history</button></div>` : "";
+  if (O.ph === "ask") body = `<div class="ball">🔮</div><input id="oq" class="oin" maxlength="80" placeholder="Ask the oracle anything…" autocomplete="off"><button class="go" data-act="oask">ASK THE ORACLE</button>${hist}`;
+  else if (O.ph === "busy") body = `<div class="ball shake">🔮</div><div class="oq">“${esc(O.q)}”</div><div class="orow"><div class="coin" id="ocoin" style="visibility:hidden"></div><div class="die" id="odie"></div></div><div class="onote" id="onote">The oracle is thinking…</div>`;
+  else body = `<div class="ball glow">${O.yes ? "✅" : "❌"}</div><div class="oq">“${esc(O.q)}”</div>
+      <div class="ores ${O.yes ? "y" : "n"}">${O.yes ? "YES" : "NO"}</div>
+      <div class="olv">🎲 ${O.die}: ${OL[O.die - 1]}</div><div class="osay">${OS[O.die - 1]}</div>
+      ${BOT_LINK ? '<button class="go" data-act="oshare" style="margin-bottom:12px">📨 Share this answer</button>' : ""}
+      <button class="${BOT_LINK ? "alt" : "go"}" data-act="oagain" style="margin-top:0">ASK AGAIN</button>${hist}`;
+  $("app").innerHTML = `<div class="hud"><span>🔮 Fun Oracle</span><span class="st" style="min-width:0"></span></div>${body}<div class="fine">For fun only. Answers are random.</div><button class="alt" data-act="hub">← All games</button>`;
+}
+function oracleAsk() {
+  const O = ORC, inp = $("oq"); if (!O || O.ph !== "ask") return;
+  const q = (inp.value || "").trim();
+  if (!q) { inp.classList.add("bad"); inp.focus(); return; }
+  Object.assign(O, {ph: "busy", q, yes: Math.random() < .5, die: 1 + Math.floor(Math.random() * 6)});
+  oracleDraw(); haptic("medium");
+  const at = (ms, fn) => setTimeout(() => { if (ORC === O) fn(); }, ms);
+  at(900, () => { const c = $("ocoin"); c.style.visibility = "visible"; c.textContent = "🪙"; c.classList.add("spin"); $("onote").textContent = "Flipping the coin…"; beep(300, .08); });
+  at(2100, () => { const c = $("ocoin"); c.classList.remove("spin"); c.textContent = O.yes ? "YES" : "NO"; $("onote").textContent = `The coin says ${O.yes ? "YES" : "NO"}!`; haptic("heavy"); beep(O.yes ? 660 : 220, .18); });
+  for (let i = 0; i < 10; i++) at(3000 + i * 100, () => { $("odie").textContent = ODIE[Math.floor(Math.random() * 6)]; $("onote").textContent = "Now, how sure is it? Rolling the dice…"; beep(400 + i * 40, .04); });
+  at(4100, () => {
+    OH.unshift({q, y: O.yes, d: O.die}); OH = OH.slice(0, 10); store.set("oracle-hist", JSON.stringify(OH));
+    O.ph = "done"; oracleDraw(); buzz("success"); beep(O.yes ? 880 : 330, .25);
+  });
+}
+function oracleShare() {
+  const O = ORC, text = `🔮 “${O.q}”\n${O.yes ? "YES" : "NO"}: ${OL[O.die - 1]} (${O.die}/6)`, url = `https://t.me/share/url?url=${encodeURIComponent(BOT_LINK)}&text=${encodeURIComponent(text)}`;
+  try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) {}
+  window.open(url, "_blank");
+}
+document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target && e.target.id === "oq") oracleAsk(); });
+
 $("app").addEventListener("click", e => {
   const a = e.target.closest("[data-act]");
   if (a) {
@@ -387,6 +449,8 @@ $("app").addEventListener("click", e => {
     if (x === "hub") return hub(); if (x === "flag") return flagHome();
     if (x === "ludo" || x === "lmenu") return ludoMenu(); if (x === "bots") return ludoStart(+a.dataset.n); if (x === "roll") return ludoRoll();
     if (x === "chess" || x === "cnew") return chessStart();
+    if (x === "oracle" || x === "oagain") return oracleStart(); if (x === "oask") return oracleAsk(); if (x === "oshare") return oracleShare();
+    if (x === "oclear") { OH = []; store.set("oracle-hist", "[]"); return oracleDraw(); }
     return;
   }
   const sq = e.target.closest("[data-sq]"); if (sq) return chessClick(+sq.dataset.sq);
