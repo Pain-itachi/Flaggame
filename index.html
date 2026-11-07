@@ -62,21 +62,27 @@ h1 span{color:var(--accent)}
 .tok{transform-box:fill-box;transform-origin:center}.tok.mv{cursor:pointer;animation:pul .8s infinite}
 @keyframes pul{50%{transform:scale(1.18)}}
 .ball{width:150px;height:150px;border-radius:50%;margin:10px auto 18px;display:grid;place-items:center;font-size:64px;background:radial-gradient(circle at 35% 30%,#c4b5fd,#7c3aed 55%,#2e1065);box-shadow:0 0 40px rgba(124,58,237,.55)}
-.ball.glow{box-shadow:0 0 60px rgba(250,204,21,.6)}.ball.shake{animation:shk .5s infinite}
-@keyframes shk{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
-.oin{width:100%;background:var(--card);border:2px solid var(--line);color:var(--text);border-radius:14px;padding:15px;font:inherit;font-size:17px;margin-bottom:14px}
-.oin.bad{border-color:var(--bad)}
+.ball.glow{box-shadow:0 0 60px rgba(226,232,240,.55)}
+.oin{width:100%;background:var(--card);border:2px solid var(--line);color:var(--text);border-radius:14px;padding:15px;font:inherit;font-size:17px;margin-bottom:12px}.oin.bad{border-color:var(--bad)}
+.mindbox{background:var(--card);border:2px dashed #7c3aed;border-radius:14px;padding:18px;text-align:center;font-weight:700;margin-bottom:16px;line-height:1.5}.mindbox small{color:var(--dim);font-weight:500}
 .oq{text-align:center;color:var(--dim);margin:6px 0 14px;font-weight:600;word-break:break-word}
-.orow{display:flex;justify-content:center;gap:28px;align-items:center;margin:8px 0;min-height:90px}
-.coin{width:84px;height:84px;border-radius:50%;background:#facc15;color:#1a1500;display:grid;place-items:center;font-size:24px;font-weight:800}
-.coin.spin{animation:spn .5s linear infinite}@keyframes spn{to{transform:rotateY(360deg)}}
-.die{font-size:84px;line-height:1;min-width:84px;text-align:center}
-.onote{text-align:center;font-weight:700;margin-top:10px;min-height:24px}
 .ores{text-align:center;font-size:64px;font-weight:800;letter-spacing:2px;line-height:1.1}.ores.y{color:var(--ok)}.ores.n{color:var(--bad)}
-.olv{text-align:center;font-size:22px;font-weight:800;margin-top:6px}.osay{text-align:center;color:var(--dim);margin:6px 0 18px}
-.ohist{margin-top:22px;font-size:14px}.ohist h3{font-size:13px;color:var(--dim);margin-bottom:8px}
-.ohist .r{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}.ohist .r span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.olv{text-align:center;font-size:20px;font-weight:800;margin-top:8px}.osay{text-align:center;color:var(--dim);margin:8px 0 18px}
 .fine{margin-top:18px;text-align:center;font-size:11px;color:#5b5e70}
+.stage{position:fixed;inset:0;z-index:50;perspective:900px;overflow:hidden;background:radial-gradient(ellipse at 50% 18%,#4c1d95 0%,#1e1b4b 55%,#0b0716 100%)}
+.stq{position:absolute;top:calc(env(safe-area-inset-top,0px) + 18px);left:0;right:0;text-align:center;padding:0 22px;font-weight:700;color:#ddd6fe;word-break:break-word}
+.stres{position:absolute;top:calc(env(safe-area-inset-top,0px) + 74px);left:0;right:0;text-align:center;font-size:42px;font-weight:800;color:#fff}.stres.y{color:#4ade80}.stres.n{color:#f87171}
+.floor{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(#5b3a8c,#241446 40%,#120a28);border-top:2px solid rgba(255,255,255,.2)}
+.shd{position:absolute;left:50%;width:calc(var(--s)*.9);height:calc(var(--s)*.2);margin-left:calc(var(--s)*-.45);border-radius:50%;background:rgba(0,0,0,.55);filter:blur(7px)}
+.stbtn{position:absolute;left:18px;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);width:auto}.stbtn[hidden]{display:none}
+.coin3,.cube{position:absolute;left:50%;top:0;width:var(--s);height:var(--s);margin-left:calc(var(--s)*-.5);transform-style:preserve-3d}
+.face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;display:grid;place-items:center;font-size:calc(var(--s)*.26);font-weight:800;color:#4b5563;letter-spacing:1px;text-shadow:0 1px 0 #fff,0 -1px 1px rgba(0,0,0,.25);background:radial-gradient(circle at 32% 28%,#fff 0%,#e5e7eb 28%,#aeb6c1 62%,#d7dce2 100%);box-shadow:inset 0 0 0 calc(var(--s)*.05) #c9ced6,inset 0 0 0 calc(var(--s)*.07) #8d96a3}
+.face.fr{transform:translateZ(5px)}.face.bk{transform:rotateX(180deg) translateZ(5px)}
+.sl{position:absolute;inset:0;border-radius:50%;background:linear-gradient(90deg,#8b94a1,#e5e7eb,#8b94a1)}
+.cf{position:absolute;inset:0;background:linear-gradient(145deg,#fff,#e2e8f0);border:2px solid #cbd5e1;border-radius:14%;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:14%;backface-visibility:hidden}
+.cf i{border-radius:50%;margin:10%}.cf i.pp{background:#111827}.cf.c1 i.pp{background:#dc2626}
+.c1{transform:translateZ(calc(var(--s)/2))}.c6{transform:rotateY(180deg) translateZ(calc(var(--s)/2))}.c2{transform:rotateY(90deg) translateZ(calc(var(--s)/2))}
+.c5{transform:rotateY(-90deg) translateZ(calc(var(--s)/2))}.c3{transform:rotateX(90deg) translateZ(calc(var(--s)/2))}.c4{transform:rotateX(-90deg) translateZ(calc(var(--s)/2))}
 </style>
 </head>
 <body>
@@ -400,47 +406,95 @@ function ludoPick(k) { const L = LD; if (L && L.ph === "pick" && L.mv.includes(k
 // ================= FUN ORACLE =================
 const OL = ["Fairly agree", "Agree", "Mostly agree", "Really agree", "Very much agree", "Strongly agree"];
 const OS = ["The oracle shrugs, but fine.", "The oracle nods slowly.", "The oracle leans in: pretty sure.", "The oracle is quite convinced.", "The oracle would bet its crystal ball on it.", "The universe is shouting this at you!"];
-const ODIE = "⚀⚁⚂⚃⚄⚅";
-let OH = [];
-function beep(f, d) { try { const A = window.AudioContext || window.webkitAudioContext, c = beep.c || (beep.c = new A()), o = c.createOscillator(), g = c.createGain(); o.frequency.value = f; g.gain.value = .06; o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime + d); } catch (e) {} }
-function haptic(t) { try { tg.HapticFeedback.impactOccurred(t); } catch (e) { try { navigator.vibrate(25); } catch (e2) {} } }
-async function oracleStart() {
-  try { OH = JSON.parse((await store.get("oracle-hist")) || "[]"); } catch (e) { OH = []; }
-  ORC = {ph: "ask"}; oracleDraw();
+const FR = {1: "", 2: "rotateY(-90deg)", 3: "rotateX(-90deg)", 4: "rotateX(90deg)", 5: "rotateY(90deg)", 6: "rotateY(-180deg)"}; // turns the cube so that face n looks at you
+const PIPS = {1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8]};
+const dface = n => `<div class="cf c${n}">${[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<i class="${PIPS[n].includes(i) ? "pp" : ""}"></i>`).join("")}</div>`;
+function ac() { const A = window.AudioContext || window.webkitAudioContext; return ac.c || (ac.c = new A()); }
+function unlockAudio() { try { ac().resume(); } catch (e) {} }
+function noise(c, len, power) { const b = c.createBuffer(1, Math.floor(c.sampleRate * len), c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, power); return b; }
+function clink(vol, pitch) { // a silver coin hitting a hard floor: bright metallic ring plus a tiny click
+  try {
+    const c = ac(), t = c.currentTime;
+    [[2637, 1], [3951, .7], [5274, .5], [6900, .3]].forEach(([f, g], i) => { const o = c.createOscillator(), n = c.createGain(); o.frequency.value = f * (pitch || 1) * (1 + Math.random() * .012); n.gain.setValueAtTime(vol * g * .2, t); n.gain.exponentialRampToValueAtTime(.0001, t + .3 + i * .06); o.connect(n); n.connect(c.destination); o.start(t); o.stop(t + .5 + i * .06); });
+    const s = c.createBufferSource(), g = c.createGain(); s.buffer = noise(c, .03, 1); g.gain.value = vol * .5; s.connect(g); g.connect(c.destination); s.start(t);
+  } catch (e) {}
 }
+function clack(vol) { // a dice knocking on a table: a dull click and a low thump
+  try {
+    const c = ac(), t = c.currentTime, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = noise(c, .07, 3); f.type = "bandpass"; f.frequency.value = 900 + Math.random() * 600; f.Q.value = 1.2; g.gain.value = vol * 1.6; s.connect(f); f.connect(g); g.connect(c.destination); s.start(t);
+    const o = c.createOscillator(), og = c.createGain(); o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(90, t + .08); og.gain.setValueAtTime(vol * .35, t); og.gain.exponentialRampToValueAtTime(.001, t + .1); o.connect(og); og.connect(c.destination); o.start(t); o.stop(t + .12);
+  } catch (e) {}
+}
+function haptic(t) { try { tg.HapticFeedback.impactOccurred(t); } catch (e) { try { navigator.vibrate(25); } catch (e2) {} } }
+const ease = u => 1 - (1 - u) * (1 - u);
+function segY(t, segs) { for (const [a, b, h, k] of segs) if (t >= a && t < b) { const u = (t - a) / (b - a); return k === "f" ? h * (1 - u * u) : 4 * h * u * (1 - u); } return 0; }
+function animate(O, ph, dur, frame, done) { const t0 = performance.now(); const step = now => { if (ORC !== O || O.ph !== ph) return; const t = Math.min((now - t0) / 1000, dur); frame(t); if (t < dur) requestAnimationFrame(step); else done(); }; requestAnimationFrame(step); }
+const qLine = O => O.q ? `“${esc(O.q)}”` : "🧠 Your secret question";
+const sched = (O, ph) => (ms, fn) => setTimeout(() => { if (ORC === O && O.ph === ph) fn(); }, ms);
+
+function oracleStart() { ORC = {ph: "ask", mind: false}; oracleDraw(); }
 function oracleDraw() {
   const O = ORC; let body;
-  const hist = OH.length ? `<div class="ohist"><h3>RECENT QUESTIONS</h3>${OH.map(h => `<div class="r">${h.y ? "✅" : "❌"}<span>${esc(h.q)}</span><small>🎲${h.d}</small></div>`).join("")}<button class="alt" data-act="oclear" style="margin-top:12px;padding:10px">Clear history</button></div>` : "";
-  if (O.ph === "ask") body = `<div class="ball">🔮</div><input id="oq" class="oin" maxlength="80" placeholder="Ask the oracle anything…" autocomplete="off"><button class="go" data-act="oask">ASK THE ORACLE</button>${hist}`;
-  else if (O.ph === "busy") body = `<div class="ball shake">🔮</div><div class="oq">“${esc(O.q)}”</div><div class="orow"><div class="coin" id="ocoin" style="visibility:hidden"></div><div class="die" id="odie"></div></div><div class="onote" id="onote">The oracle is thinking…</div>`;
-  else body = `<div class="ball glow">${O.yes ? "✅" : "❌"}</div><div class="oq">“${esc(O.q)}”</div>
+  if (O.ph === "ask") body = `<div class="ball">🔮</div>` + (O.mind
+    ? `<div class="mindbox">🧠 Think of your question in your mind…<br><small>When you are ready, toss the coin.</small></div>`
+    : `<input id="oq" class="oin" maxlength="80" placeholder="Type your question…" autocomplete="off"><button class="alt" data-act="omind" style="margin:0 0 14px;padding:12px">🧠 I'll think of it in my mind</button>`)
+    + `<button class="go" data-act="otoss">🪙 TOSS THE COIN</button>`;
+  else body = `<div class="ball glow">${O.yes ? "✅" : "❌"}</div><div class="oq">${qLine(O)}</div>
       <div class="ores ${O.yes ? "y" : "n"}">${O.yes ? "YES" : "NO"}</div>
-      <div class="olv">🎲 ${O.die}: ${OL[O.die - 1]}</div><div class="osay">${OS[O.die - 1]}</div>
+      <div class="olv">🪙 Coin: ${O.yes ? "YES" : "NO"}</div><div class="olv" style="margin-top:4px">🎲 Dice ${O.die}: ${OL[O.die - 1]}</div><div class="osay">${OS[O.die - 1]}</div>
       ${BOT_LINK ? '<button class="go" data-act="oshare" style="margin-bottom:12px">📨 Share this answer</button>' : ""}
-      <button class="${BOT_LINK ? "alt" : "go"}" data-act="oagain" style="margin-top:0">ASK AGAIN</button>${hist}`;
+      <button class="${BOT_LINK ? "alt" : "go"}" data-act="oagain" style="margin-top:0">ASK AGAIN</button>`;
   $("app").innerHTML = `<div class="hud"><span>🔮 Fun Oracle</span><span class="st" style="min-width:0"></span></div>${body}<div class="fine">For fun only. Answers are random.</div><button class="alt" data-act="hub">← All games</button>`;
 }
-function oracleAsk() {
-  const O = ORC, inp = $("oq"); if (!O || O.ph !== "ask") return;
-  const q = (inp.value || "").trim();
-  if (!q) { inp.classList.add("bad"); inp.focus(); return; }
-  Object.assign(O, {ph: "busy", q, yes: Math.random() < .5, die: 1 + Math.floor(Math.random() * 6)});
-  oracleDraw(); haptic("medium");
-  const at = (ms, fn) => setTimeout(() => { if (ORC === O) fn(); }, ms);
-  at(900, () => { const c = $("ocoin"); c.style.visibility = "visible"; c.textContent = "🪙"; c.classList.add("spin"); $("onote").textContent = "Flipping the coin…"; beep(300, .08); });
-  at(2100, () => { const c = $("ocoin"); c.classList.remove("spin"); c.textContent = O.yes ? "YES" : "NO"; $("onote").textContent = `The coin says ${O.yes ? "YES" : "NO"}!`; haptic("heavy"); beep(O.yes ? 660 : 220, .18); });
-  for (let i = 0; i < 10; i++) at(3000 + i * 100, () => { $("odie").textContent = ODIE[Math.floor(Math.random() * 6)]; $("onote").textContent = "Now, how sure is it? Rolling the dice…"; beep(400 + i * 40, .04); });
-  at(4100, () => {
-    OH.unshift({q, y: O.yes, d: O.die}); OH = OH.slice(0, 10); store.set("oracle-hist", JSON.stringify(OH));
-    O.ph = "done"; oracleDraw(); buzz("success"); beep(O.yes ? 880 : 330, .25);
+
+// STEP 1: the coin is thrown up, flips upside down several times and bounces on the floor (full page)
+function oracleToss() {
+  const O = ORC; if (!O || O.ph !== "ask") return; unlockAudio();
+  let q = ""; if (!O.mind) { const inp = $("oq"); q = (inp.value || "").trim(); if (!q) { inp.classList.add("bad"); inp.focus(); return; } }
+  Object.assign(O, {ph: "coin", q, yes: Math.random() < .5, die: 1 + Math.floor(Math.random() * 6)});
+  const vh = innerHeight, vw = innerWidth, floorY = Math.round(vh * .78), size = Math.round(Math.min(vw * .38, 150));
+  $("app").innerHTML = `<div class="stage" style="--s:${size}px"><div class="stq">${qLine(O)}</div><div class="stres" id="stres">Tossing…</div><div class="floor" style="top:${floorY}px"></div><div class="shd" id="shd" style="top:${floorY - 6}px"></div>
+    <div class="coin3" id="c3"><div class="face fr">YES</div><div class="face bk">NO</div>${[-4, -3, -2, -1, 0, 1, 2, 3, 4].map(z => `<i class="sl" style="transform:translateZ(${z}px)"></i>`).join("")}</div>
+    <button class="go stbtn" id="chk" data-act="ocheck" hidden>🎲 CHECK HOW SURE IT IS</button></div>`;
+  const c3 = $("c3"), shd = $("shd"), H = floorY * .8, A = 360 * 5 + (O.yes ? 0 : 180), at = sched(O, "coin");
+  const segs = [[0, 1.7, H * .78], [1.7, 2.35, H * .17], [2.35, 2.8, H * .06], [2.8, 3.1, H * .02]];
+  [[1700, 1, 1], [2350, .55, 1.05], [2800, .3, 1.1], [3100, .16, 1.15]].forEach(([ms, v, p]) => at(ms, () => { clink(v, p); if (v > .5) haptic("medium"); }));
+  [3180, 3240, 3290, 3330, 3365, 3395, 3420].forEach((ms, i) => at(ms, () => clink(.1 - i * .01, 1.3 + i * .05))); // the coin rattling to a stop
+  const rest = `translateY(${floorY - 40 - size / 2}px) rotateX(${50 + A}deg)`;
+  animate(O, "coin", 3.5, t => {
+    const h = segY(t, segs), ang = t < 1.7 ? A * (1 - Math.pow(1 - t / 1.7, 1.8)) : A + 16 * Math.sin((t - 1.7) * 16) * Math.exp(-(t - 1.7) * 2.2);
+    c3.style.transform = `translateY(${floorY - 40 - h - size / 2}px) rotateX(${50 + ang}deg)`;
+    shd.style.transform = `scale(${1 - h / H * .55})`; shd.style.opacity = 1 - h / H * .6;
+  }, () => { c3.style.transform = rest; $("stres").textContent = O.yes ? "YES!" : "NO!"; $("stres").className = "stres " + (O.yes ? "y" : "n"); $("chk").hidden = false; buzz("success"); });
+}
+
+// STEP 2: only after the button is tapped, a big dice is thrown on the ground (full page)
+function oracleDice() {
+  const O = ORC; if (!O || O.ph !== "coin" || $("chk").hidden) return; unlockAudio(); O.ph = "dice";
+  const vh = innerHeight, vw = innerWidth, floorY = Math.round(vh * .78), size = Math.round(Math.min(vw * .34, 170));
+  $("app").innerHTML = `<div class="stage" style="--s:${size}px"><div class="stq">${qLine(O)} · 🪙 ${O.yes ? "YES" : "NO"}</div><div class="stres" id="stres">Rolling…</div><div class="floor" style="top:${floorY}px"></div><div class="shd" id="shd" style="top:${floorY - 8}px"></div>
+    <div class="cube" id="cb">${[1, 2, 3, 4, 5, 6].map(dface).join("")}</div></div>`;
+  const cb = $("cb"), shd = $("shd"), H = floorY * .8, at = sched(O, "dice"), sg = Math.random() < .5 ? 1 : -1;
+  const segs = [[0, .85, H * .85, "f"], [.85, 1.5, H * .24], [1.5, 2.0, H * .09], [2.0, 2.4, H * .035], [2.4, 2.65, H * .012]];
+  [[850, 1], [1500, .7], [2000, .5], [2400, .3], [2650, .18]].forEach(([ms, v]) => at(ms, () => { clack(v); if (v > .5) haptic("heavy"); }));
+  [1150, 1250, 1750, 2200, 2540].forEach(ms => at(ms, () => clack(.12))); // rolling over its edges
+  animate(O, "dice", 3.0, t => {
+    const h = segY(t, segs), k = Math.pow(1 - Math.min(t / 2.6, 1), 2), x = (1 - ease(Math.min(t / 2.4, 1))) * (-vw * .42);
+    cb.style.transform = `translate(${x}px, ${floorY - 4 - size - h}px) rotateX(-24deg) rotateY(-30deg) rotateX(${1080 * k}deg) rotateY(${1440 * sg * k}deg) rotateZ(${540 * k}deg) ${FR[O.die]}`;
+    shd.style.transform = `translateX(${x}px) scale(${1 - h / H * .5})`; shd.style.opacity = 1 - h / H * .6;
+  }, () => {
+    cb.style.transform = `translate(0px, ${floorY - 4 - size}px) rotateX(-24deg) rotateY(-30deg) ${FR[O.die]}`;
+    $("stres").textContent = `🎲 ${O.die}: ${OL[O.die - 1]}`; buzz("success");
+    at(1500, () => { O.ph = "done"; oracleDraw(); });
   });
 }
 function oracleShare() {
-  const O = ORC, text = `🔮 “${O.q}”\n${O.yes ? "YES" : "NO"}: ${OL[O.die - 1]} (${O.die}/6)`, url = `https://t.me/share/url?url=${encodeURIComponent(BOT_LINK)}&text=${encodeURIComponent(text)}`;
+  const O = ORC, text = `🔮 ${O.q ? "“" + O.q + "”" : "My secret question"}\n${O.yes ? "YES" : "NO"}: ${OL[O.die - 1]} (${O.die}/6)`, url = `https://t.me/share/url?url=${encodeURIComponent(BOT_LINK)}&text=${encodeURIComponent(text)}`;
   try { if (tg && tg.openTelegramLink) return tg.openTelegramLink(url); } catch (e) {}
   window.open(url, "_blank");
 }
-document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target && e.target.id === "oq") oracleAsk(); });
+document.addEventListener("keydown", e => { if (e.key === "Enter" && e.target && e.target.id === "oq") oracleToss(); });
 
 $("app").addEventListener("click", e => {
   const a = e.target.closest("[data-act]");
@@ -449,8 +503,8 @@ $("app").addEventListener("click", e => {
     if (x === "hub") return hub(); if (x === "flag") return flagHome();
     if (x === "ludo" || x === "lmenu") return ludoMenu(); if (x === "bots") return ludoStart(+a.dataset.n); if (x === "roll") return ludoRoll();
     if (x === "chess" || x === "cnew") return chessStart();
-    if (x === "oracle" || x === "oagain") return oracleStart(); if (x === "oask") return oracleAsk(); if (x === "oshare") return oracleShare();
-    if (x === "oclear") { OH = []; store.set("oracle-hist", "[]"); return oracleDraw(); }
+    if (x === "oracle" || x === "oagain") return oracleStart(); if (x === "omind") { ORC.mind = true; return oracleDraw(); }
+    if (x === "otoss") return oracleToss(); if (x === "ocheck") return oracleDice(); if (x === "oshare") return oracleShare();
     return;
   }
   const sq = e.target.closest("[data-sq]"); if (sq) return chessClick(+sq.dataset.sq);
